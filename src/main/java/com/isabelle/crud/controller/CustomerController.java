@@ -61,6 +61,7 @@ public class CustomerController {
     @GetMapping
     public List<CustomerResponseDTO> getAllCustomers() {
 
+        //todo: substituir lambda
         return customerService
                 .getAllCustomers()
                 .stream()
@@ -72,6 +73,7 @@ public class CustomerController {
     public CustomerResponseDTO getCustomerById(
             @PathVariable Long id) {
 
+        //todo: substituir lambda
         Customer customer =
                 customerService
                         .getCustomerById(id)
@@ -86,6 +88,12 @@ public class CustomerController {
         customerService.deleteCustomer(id);
     }
 
+    @DeleteMapping("/{document}/{type}")
+    public void deleteByDocumentAndType(@PathVariable String document,
+                                        @PathVariable String type){
+        customerService.deleteByDocumentAndType(document,type);
+    }
+
     @PutMapping("/{id}")
     public Customer updateCustomer(
         @PathVariable Long id,
@@ -97,11 +105,24 @@ public class CustomerController {
     public CustomerResponseDTO getCustomerByDocument(
             @PathVariable String document) {
 
+        //todo: substituir lambda
         Customer customer =
                 customerService
                         .getCustomerByDocument(document)
                         .orElseThrow(() ->
                                 new RuntimeException("Cliente não encontrado"));
+
+        return toResponseDTO(customer);
+    }
+
+    @GetMapping("/document/{document}/{type}")
+    public CustomerResponseDTO getCustomerByDocumentAndType(
+            @PathVariable String document, @PathVariable String type) {
+
+        //todo: substituir lambda
+        Customer customer =
+                customerService.getCustomerByDocumentAndType(document,type);
+
 
         return toResponseDTO(customer);
     }
@@ -118,10 +139,7 @@ public class CustomerController {
         );
     }
 
-    // todo: olhar todo o arquivo
-    // todo: Ao inves de lançar o objeto, lançar dentro do Response Entity.
-    // todo: Quando não encontrar o documento lançar o 404
-    // todo: estudar http status
+
 
 
 }
