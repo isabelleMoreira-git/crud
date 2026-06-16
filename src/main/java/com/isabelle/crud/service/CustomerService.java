@@ -1,6 +1,7 @@
 package com.isabelle.crud.service;
 
 import com.isabelle.crud.entity.Customer;
+import com.isabelle.crud.exception.CustomerNotFoundException;
 import com.isabelle.crud.repository.CustomerRepository;
 import com.isabelle.crud.exception.CustomerAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +17,9 @@ public class CustomerService {
     private CustomerRepository customerRepository;
 
     public Customer createCustomer(Customer customer) {
-
-        List<Customer> allCustomers = customerRepository.findAll();
-
-        if (allCustomers.contains(customer)) {
-            System.out.println("O cliente já existe.");
-            throw new CustomerAlreadyExistsException("Cliente já cadastrado com esse documento");
-        } else {
-            return customerRepository.save(customer);
-        }
-
-        //todo: Perguntar sobre o try/catch
+        validateCustomer(customer);
+        return customerRepository.save(customer);
     }
-
-    /*List<Customer> allCustomers = customerRepository.findAll();
-
-for (int i = 0; i < allCustomers.size(); i++) {
-
-    Customer c = allCustomers.get(i);
-
-    if (c.getDocument().equals(customer.getDocument())) {
-        throw new CustomerAlreadyExistsException(
-            "Cliente já cadastrado com esse documento"
-        );
-    }
-}
-
-return customerRepository.save(customer);*/
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
@@ -58,7 +35,12 @@ return customerRepository.save(customer);*/
 
     public void validateCustomer(Customer customer){
         if(customer == null){
-            throw new IllegalArgumentException("Esse cliente não existe.");
+            System.out.println("Esse cliente não existe");
+            throw new CustomerNotFoundException("Esse cliente não existe.");
+        }
+        if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
+            System.out.println("Já existe um cliente com esse documento.");
+            throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
         }
     }
 
@@ -96,10 +78,6 @@ return customerRepository.save(customer);*/
     }
 
     public Customer getCustomerByDocumentAndType(String document, String pfouPj) {
-        //O objetivo é substituir o findByDocument()? não
-
-//        Optional<Customer> optionalDocument = customerRepository.findByDocument(document);
-//        boolean containsDocument = optionalDocument.isPresent();
 
         Customer customer = customerRepository.findByDocumentAndType(document, pfouPj);
         // Inserir valor que não existe!!
@@ -166,8 +144,15 @@ return customerRepository.save(customer);*/
 //        System.out.println("Alarme de update");
 //    }
 
+----------------------------------------------------------------------------
+CreateCustomer
 
-//        if (optionalDocument == null) {
-//            throw new CustomerNotFoundException("Não existe um cliente com esse documento.");
+//        List<Customer> allCustomers = customerRepository.findAll();
+//
+//        if (allCustomers.contains(customer)) {
+//            System.out.println("O cliente já existe.");
+//            throw new CustomerAlreadyExistsException("Cliente já cadastrado com esse documento");
+//        } else {
+//            return customerRepository.save(customer);
 //        }
 */
