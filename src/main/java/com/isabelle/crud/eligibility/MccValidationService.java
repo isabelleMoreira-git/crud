@@ -26,6 +26,7 @@ public class MccValidationService {
         System.out.println(allowedMccs);
     }
 
+
     public boolean MccIsValid(String mcc) {
         System.out.println("Iniciando validação do MCC: " + mcc);
 
@@ -43,4 +44,5 @@ public class MccValidationService {
 
 }
 
+// Transformar a lista pra receber enum. 742 = taxista mcc.taxista
 

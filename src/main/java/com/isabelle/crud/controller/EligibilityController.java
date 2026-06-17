@@ -32,14 +32,12 @@ public class EligibilityController {
     public boolean checkEligibility(
             @PathVariable String document) {
 
+        //todo: substituir lambda
         Customer customer = customerService
                 .getCustomerByDocument(document)
                 .orElseThrow(() ->
                         new RuntimeException("Cliente não encontrado"));
 
         return eligibilityService.isEligible(customer);
-
-        //todo: não utilizar lambda.
     }
 }
-// todo: estudar @autowired.
