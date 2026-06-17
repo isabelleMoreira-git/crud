@@ -53,22 +53,32 @@ public class CustomerService {
         if ("PF".equals(pfOrPj)){
             customerRepository.deleteById(customer.getId());
         } else {
-            throw new IllegalArgumentException("Não é possível deletar Pessoa Jurídica.");
+            throw new IllegalArgumentException("Não é possível apagar Pessoa Jurídica.");
         }
     }
 
-    //todo: Fazer um delete by document (só se o ducumento for válido e se for pessoa fisica)
+    //todo: Fazer um delete by document (só se o documento for válido e se for pessoa física)
     // ( se for PJ lançar EX personalizada)
 
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
 
-        //todo: substituir lambda
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+//        Customer customer = customerRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        customer.setMcc(updatedCustomer.getMcc());
-        customer.setAnnualTpv(updatedCustomer.getAnnualTpv());
-        customer.setCustomerCompanyFlag(updatedCustomer.getCustomerCompanyFlag());
+        Customer customer;
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        boolean foundCustomer = optionalCustomer.isPresent();
+
+        if (foundCustomer) {
+            customer = optionalCustomer.get();
+
+            customer.setMcc(updatedCustomer.getMcc());
+            customer.setAnnualTpv(updatedCustomer.getAnnualTpv());
+            customer.setCustomerCompanyFlag(updatedCustomer.getCustomerCompanyFlag());
+        }else{
+            throw new CustomerNotFoundException("O cliente não foi encontrado.");
+        }
 
         return customerRepository.save(customer);
     }
@@ -77,11 +87,11 @@ public class CustomerService {
         return customerRepository.findByDocument(document);
     }
 
-    public Customer getCustomerByDocumentAndType(String document, String pfouPj) {
+    public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
 
-        Customer customer = customerRepository.findByDocumentAndType(document, pfouPj);
-        // Inserir valor que não existe!!
-        // docker stop
+
+        Customer customer = customerRepository.findByDocumentAndType(document, pfOuPj);
+
 
         if (customer != null) {
             System.out.println("O cliente foi encontrado.");
@@ -90,8 +100,10 @@ public class CustomerService {
             throw new IllegalArgumentException("Não existe um cliente com esse documento e tipo.");
             //Criar exceção personalizada? Crio outro.
 
-            //É pra remover o Optional apenas desse, ou dos outros também? alguns.
-            //É pra retornar o que se encontrar o documento e não for o tipo certo? ex.
+            //É pra remover o Optional apenas desse, ou dos outros também? Alguns.
+            //É pra retornar o que se encontrar o documento e não for o tipo certo? Ex.
+            // Inserir valor que não existe!!
+            // Docker stop
         }
     }
 

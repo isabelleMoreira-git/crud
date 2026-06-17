@@ -3,12 +3,14 @@ package com.isabelle.crud.controller;
 import com.isabelle.crud.dto.CustomerRequestDTO;
 import com.isabelle.crud.dto.CustomerResponseDTO;
 import com.isabelle.crud.entity.Customer;
+import com.isabelle.crud.exception.CustomerNotFoundException;
 import com.isabelle.crud.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,18 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    private CustomerResponseDTO toResponseDTO(Customer customer) {
+
+        return new CustomerResponseDTO(
+                customer.getId(),
+                customer.getDocument(),
+                customer.getIndicationDocumentType(),
+                customer.getCustomerCompanyFlag(),
+                customer.getMcc(),
+                customer.getAnnualTpv()
+        );
+    }
 
     // Injeção de Dependência pelo construtor
 //    private final CustomerService customerService;
@@ -61,26 +75,40 @@ public class CustomerController {
     @GetMapping
     public List<CustomerResponseDTO> getAllCustomers() {
 
-        //todo: substituir lambda
-        return customerService
-                .getAllCustomers()
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+//        return customerService.getAllCustomers()
+//                .stream()
+//                .map(this::toResponseDTO)
+//                .toList();
+
+        List<CustomerResponseDTO> AllCustomers = new ArrayList<>();
+
+        for (int i=0; i<customerService.getAllCustomers().size(); i++){
+
+            CustomerResponseDTO dto = toResponseDTO(customerService.getAllCustomers().get(i));
+            AllCustomers.add(dto);
+        }
+
+        return AllCustomers;
     }
 
     @GetMapping("/{id}")
     public CustomerResponseDTO getCustomerById(
             @PathVariable Long id) {
 
-        //todo: substituir lambda
-        Customer customer =
-                customerService
-                        .getCustomerById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException("Cliente não encontrado"));
+//        Customer customer =
+//                customerService
+//                        .getCustomerById(id)
+//                        .orElseThrow(() ->
+//                                new RuntimeException("Cliente não encontrado"));
 
-        return toResponseDTO(customer);
+        Optional<Customer> optionalCustomer = customerService.getCustomerById(id);
+        boolean foundCustomer = optionalCustomer.isPresent();
+        if (foundCustomer) {
+            Customer customer = optionalCustomer.get();
+            return toResponseDTO(customer);
+        }else{
+            throw new CustomerNotFoundException("O cliente não foi encontrado.");
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -106,38 +134,35 @@ public class CustomerController {
             @PathVariable String document) {
 
         //todo: substituir lambda
-        Customer customer =
-                customerService
-                        .getCustomerByDocument(document)
-                        .orElseThrow(() ->
-                                new RuntimeException("Cliente não encontrado"));
+//        Customer customer =
+//                customerService
+//                        .getCustomerByDocument(document)
+//                        .orElseThrow(() ->
+//                                new RuntimeException("Cliente não encontrado"));
+//
+//        return toResponseDTO(customer);
+        Optional<Customer> optionalCustomer = customerService.getCustomerByDocument(document);
+        boolean foundDocument = optionalCustomer.isPresent();
 
-        return toResponseDTO(customer);
+        if(foundDocument){
+            Customer customer = optionalCustomer.get();
+            return toResponseDTO(customer);
+        }else{
+            throw new CustomerNotFoundException("O cliente não foi encontrado");
+        }
     }
 
     @GetMapping("/document/{document}/{type}")
     public CustomerResponseDTO getCustomerByDocumentAndType(
             @PathVariable String document, @PathVariable String type) {
 
-        //todo: substituir lambda
         Customer customer =
                 customerService.getCustomerByDocumentAndType(document,type);
-
 
         return toResponseDTO(customer);
     }
 
-    private CustomerResponseDTO toResponseDTO(Customer customer) {
 
-        return new CustomerResponseDTO(
-                customer.getId(),
-                customer.getDocument(),
-                customer.getIndicationDocumentType(),
-                customer.getCustomerCompanyFlag(),
-                customer.getMcc(),
-                customer.getAnnualTpv()
-        );
-    }
 
 
 
