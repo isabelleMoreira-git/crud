@@ -1,7 +1,10 @@
 package com.isabelle.crud.service;
 
+import com.isabelle.crud.eligibility.MccValidationService;
 import com.isabelle.crud.entity.Customer;
+import com.isabelle.crud.exception.CompanyDeletionNotAllowedException;
 import com.isabelle.crud.exception.CustomerNotFoundException;
+import com.isabelle.crud.exception.CustomerValidationException;
 import com.isabelle.crud.repository.CustomerRepository;
 import com.isabelle.crud.exception.CustomerAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +18,54 @@ import java.util.Optional;
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private MccValidationService mccValidationService;
 
     public Customer createCustomer(Customer customer) {
-        validateCustomer(customer);
+        validateCreateCustomer(customer);
         return customerRepository.save(customer);
     }
+
+    private void validateCreateCustomer(Customer customer){
+        if (customer == null){
+            System.out.println("O cliente não foi informado.");
+            throw new CustomerValidationException("O cliente não foi informado.");
+        }
+        if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
+            System.out.println("Já existe um cliente com esse documento.");
+            throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
+        }
+        if (customer.getDocument().length() != 11
+                && customer.getDocument().length() != 14
+                || customer.getDocument().equals("string")) {
+            throw new CustomerValidationException("Documento inválido.");
+        }
+        if(customer.getMcc().equals("string")
+                || !mccValidationService.MccIsValid(customer.getMcc())){
+            throw new CustomerValidationException("Mcc inválido.");
+        }
+        if((!customer.getIndicationDocumentType().equals("PF")
+                && !customer.getIndicationDocumentType().equals("PJ"))
+                || customer.getIndicationDocumentType().equals("String")){
+            throw new CustomerValidationException("Tipo de documento inválido.");
+        }
+        if(customer.getIndicationDocumentType().equals("PF")
+                && customer.getDocument().length() != 11){
+            throw new CustomerValidationException("Documento inválido para Pessoa Física.");
+        }
+        if(customer.getIndicationDocumentType().equals("PJ")
+                && customer.getDocument().length() != 14){
+            throw new CustomerValidationException("Documento inválido para Pessoa Jurídica.");
+        }
+    }
+    /*Validar:
+     * Cliente nulo OK
+     * Cliente duplicado OK
+     * Documento, mcc e tipo obrigatórios OK
+     * mcc tem que ser númerico, e dentro das opções.
+     * Tipo e documento conectados OK
+     * Não aceitar exemplo do swagger OK string ou String
+     * */
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
@@ -53,34 +99,26 @@ public class CustomerService {
         if ("PF".equals(pfOrPj)){
             customerRepository.deleteById(customer.getId());
         } else {
-            throw new IllegalArgumentException("Não é possível apagar Pessoa Jurídica.");
+            throw new CompanyDeletionNotAllowedException("Não é possível apagar Pessoa Jurídica.");
         }
     }
 
-    //todo: Fazer um delete by document (só se o documento for válido e se for pessoa física)
-    // ( se for PJ lançar EX personalizada)
-
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
-
-//        Customer customer = customerRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-
-        Customer customer;
 
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         boolean foundCustomer = optionalCustomer.isPresent();
 
         if (foundCustomer) {
-            customer = optionalCustomer.get();
+            Customer customer = optionalCustomer.get();
 
             customer.setMcc(updatedCustomer.getMcc());
             customer.setAnnualTpv(updatedCustomer.getAnnualTpv());
             customer.setCustomerCompanyFlag(updatedCustomer.getCustomerCompanyFlag());
+
+            return customerRepository.save(customer);
         }else{
             throw new CustomerNotFoundException("O cliente não foi encontrado.");
         }
-
-        return customerRepository.save(customer);
     }
 
     public Optional<Customer> getCustomerByDocument(String document) {
@@ -89,25 +127,12 @@ public class CustomerService {
 
     public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
 
-
         Customer customer = customerRepository.findByDocumentAndType(document, pfOuPj);
+        validateCustomer(customer);
 
-
-        if (customer != null) {
-            System.out.println("O cliente foi encontrado.");
-            return customer;
-        }else{
-            throw new IllegalArgumentException("Não existe um cliente com esse documento e tipo.");
-            //Criar exceção personalizada? Crio outro.
-
-            //É pra remover o Optional apenas desse, ou dos outros também? Alguns.
-            //É pra retornar o que se encontrar o documento e não for o tipo certo? Ex.
-            // Inserir valor que não existe!!
-            // Docker stop
+        return customer;
         }
     }
-
-}
 
 /* Comentários
 
@@ -164,7 +189,6 @@ CreateCustomer
 //        if (allCustomers.contains(customer)) {
 //            System.out.println("O cliente já existe.");
 //            throw new CustomerAlreadyExistsException("Cliente já cadastrado com esse documento");
-//        } else {
-//            return customerRepository.save(customer);
+//        } else {return customerRepository.save(customer);
 //        }
 */

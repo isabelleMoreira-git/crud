@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 //Unprocessable entity
-@ResponseStatus(value = HttpStatus.UNPROCESSABLE_CONTENT, reason = "Já existe um cliente com esse documento.")
+//@ResponseStatus(value = HttpStatus.UNPROCESSABLE_CONTENT)
 public class CustomerAlreadyExistsException extends RuntimeException{
 
     public CustomerAlreadyExistsException (String message){
