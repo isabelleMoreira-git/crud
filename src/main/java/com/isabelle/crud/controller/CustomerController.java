@@ -4,8 +4,12 @@ import com.isabelle.crud.dto.CustomerRequestDTO;
 import com.isabelle.crud.dto.CustomerResponseDTO;
 import com.isabelle.crud.entity.Customer;
 import com.isabelle.crud.exception.CustomerNotFoundException;
+import com.isabelle.crud.exception.CustomerValidationException;
 import com.isabelle.crud.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -41,7 +45,7 @@ public class CustomerController {
 //    }
 
     @PostMapping
-    public CustomerResponseDTO createCustomer(
+    public ResponseEntity<String> createCustomer(
             @Valid @RequestBody CustomerRequestDTO dto) {
 
         Customer customer = new Customer();
@@ -59,17 +63,31 @@ public class CustomerController {
         customer.setAnnualTpv(
                 dto.getAnnualTpv());
 
-        Customer savedCustomer =
-                customerService.createCustomer(customer);
+        try {
+            Customer savedCustomer =
+                    customerService.createCustomer(customer);
 
-        return new CustomerResponseDTO(
-                savedCustomer.getId(),
-                savedCustomer.getDocument(),
-                savedCustomer.getIndicationDocumentType(),
-                savedCustomer.getCustomerCompanyFlag(),
-                savedCustomer.getMcc(),
-                savedCustomer.getAnnualTpv()
-        );
+                return ResponseEntity.ok("Estabelecimento criado");
+                // fazer com 201
+
+//            return new CustomerResponseDTO(
+//                    savedCustomer.getId(),
+//                    savedCustomer.getDocument(),
+//                    savedCustomer.getIndicationDocumentType(),
+//                    savedCustomer.getCustomerCompanyFlag(),
+//                    savedCustomer.getMcc(),
+//                    savedCustomer.getAnnualTpv()
+//            );
+        } catch (CustomerValidationException e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body("Não veio");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //Outro catch pra CustomerAlreadyExists
+        //Não vou retornar String
+
+
     }
 
     @GetMapping
@@ -133,14 +151,9 @@ public class CustomerController {
     public CustomerResponseDTO getCustomerByDocument(
             @PathVariable String document) {
 
-        //todo: substituir lambda
-//        Customer customer =
-//                customerService
-//                        .getCustomerByDocument(document)
-//                        .orElseThrow(() ->
-//                                new RuntimeException("Cliente não encontrado"));
-//
-//        return toResponseDTO(customer);
+        //Customer customer = customerService.getCustomerByDocument(document);
+        // Alterar pra Customer
+
         Optional<Customer> optionalCustomer = customerService.getCustomerByDocument(document);
         boolean foundDocument = optionalCustomer.isPresent();
 
@@ -150,7 +163,11 @@ public class CustomerController {
         }else{
             throw new CustomerNotFoundException("O cliente não foi encontrado");
         }
+
     }
+    // Response Status. (Exceção no controller X)
+    // Retornar Customer.
+
 
     @GetMapping("/document/{document}/{type}")
     public CustomerResponseDTO getCustomerByDocumentAndType(
