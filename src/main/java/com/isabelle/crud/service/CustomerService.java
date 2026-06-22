@@ -71,22 +71,26 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-    public Optional<Customer> getCustomerById(Long id) {
-        return customerRepository.findById(id);
+    public Customer getCustomerById(Long id) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        boolean foundCustomer = optionalCustomer.isPresent();
+
+        if (foundCustomer){
+            Customer customer = optionalCustomer.get();
+            return(customer);
+        } else {
+            throw new CustomerNotFoundException("Cliente não encontrado");
+        }
     }
 
     public void deleteCustomer(Long id) {
-        customerRepository.deleteById(id);
-    }
+        Optional<Customer> optionalCustomer= customerRepository.findById(id);
+        boolean foundCustomer = optionalCustomer.isPresent();
 
-    public void validateCustomer(Customer customer){
-        if(customer == null){
-            System.out.println("Esse cliente não existe");
-            throw new CustomerNotFoundException("Esse cliente não existe.");
-        }
-        if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
-            System.out.println("Já existe um cliente com esse documento.");
-            throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
+        if (foundCustomer){
+            customerRepository.deleteById(id);
+        } else{
+            throw new CustomerNotFoundException("Cliente não encontrado");
         }
     }
 
@@ -121,8 +125,16 @@ public class CustomerService {
         }
     }
 
-    public Optional<Customer> getCustomerByDocument(String document) {
-        return customerRepository.findByDocument(document);
+    public Customer getCustomerByDocument(String document) {
+        Optional<Customer> optionalCustomer = customerRepository.findByDocument(document);
+        boolean foundCustomer = optionalCustomer.isPresent();
+
+        if (foundCustomer){
+            Customer customer = optionalCustomer.get();
+            return(customer);
+        } else {
+            throw new CustomerNotFoundException("Cliente não encontrado");
+        }
     }
 
     public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
@@ -132,7 +144,21 @@ public class CustomerService {
 
         return customer;
         }
+
+    public void validateCustomer(Customer customer){
+        if(customer == null){
+            System.out.println("Esse cliente não existe");
+            throw new CustomerNotFoundException("Esse cliente não existe.");
+        }
+        if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
+            System.out.println("Já existe um cliente com esse documento.");
+            throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
+        }
     }
+
+    }
+
+
 
 /* Comentários
 

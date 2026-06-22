@@ -11,17 +11,21 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByDocument(String document);
 
     @Query(
-            value = "SELECT * FROM customers " +
-                    "WHERE document = :document " +
-                    "AND indication_document_type = :PfOrPj",
-            nativeQuery = true
+            "SELECT c FROM Customer c " +
+            "WHERE c.document = :document " +
+            "AND c.indicationDocumentType = :PfOrPj"
     )
     Customer findByDocumentAndType(String document, String PfOrPj);
     // Usar o objeto ao invés do nome do banco.
-
-    // todo: outro findByDocument, com query nativa, vai retonar Customer
-    // todo: omo parametro (documento, pf/pj), nome do metodo = buscaDocumentoPjPf
-
-    //boolean existsByDocument(String document);
-    // query method do Spring Data JPA (SELECT EXISTS(...))
 }
+
+//boolean existsByDocument(String document);
+// query method do Spring Data JPA (SELECT EXISTS(...))
+
+// JPQL
+
+//            value = "SELECT * FROM customers " +
+//                    "WHERE document = :document " +
+//                    "AND indication_document_type = :PfOrPj",
+//            nativeQuery = true
+//    )
