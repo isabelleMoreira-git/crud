@@ -1,6 +1,6 @@
 package com.isabelle.crud.service;
 
-import com.isabelle.crud.eligibility.MccValidationService;
+//import com.isabelle.crud.eligibility.MccValidationService;
 import com.isabelle.crud.entity.Customer;
 import com.isabelle.crud.exception.CompanyDeletionNotAllowedException;
 import com.isabelle.crud.exception.CustomerNotFoundException;
@@ -18,8 +18,8 @@ import java.util.Optional;
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
-    @Autowired
-    private MccValidationService mccValidationService;
+//    @Autowired
+//    private MccValidationService mccValidationService;
 
     public Customer createCustomer(Customer customer) {
         validateCreateCustomer(customer);
@@ -40,10 +40,10 @@ public class CustomerService {
                 || customer.getDocument().equals("string")) {
             throw new CustomerValidationException("Documento inválido.");
         }
-        if(customer.getMcc().equals("string")
-                || !mccValidationService.MccIsValid(customer.getMcc())){
-            throw new CustomerValidationException("Mcc inválido.");
-        }
+//        if(customer.getMcc().equals("string")
+//                || !mccValidationService.mccIsValid(customer.getMcc())){
+//            throw new CustomerValidationException("Mcc inválido.");
+//        }
         if((!customer.getIndicationDocumentType().equals("PF")
                 && !customer.getIndicationDocumentType().equals("PJ"))
                 || customer.getIndicationDocumentType().equals("String")){
@@ -96,7 +96,9 @@ public class CustomerService {
 
     public void deleteByDocumentAndType(String document, String type){
         Customer customer = customerRepository.findByDocumentAndType(document,type);
-        validateCustomer(customer);
+        if(customer == null){
+            throw new CustomerNotFoundException("Esse cliente não existe.");
+        }
 
         String pfOrPj = customer.getIndicationDocumentType();
 
@@ -140,21 +142,12 @@ public class CustomerService {
     public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
 
         Customer customer = customerRepository.findByDocumentAndType(document, pfOuPj);
-        validateCustomer(customer);
+        if(customer == null){
+            throw new CustomerNotFoundException("Esse cliente não existe.");
+        }
 
         return customer;
         }
-
-    public void validateCustomer(Customer customer){
-        if(customer == null){
-            System.out.println("Esse cliente não existe");
-            throw new CustomerNotFoundException("Esse cliente não existe.");
-        }
-        if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
-            System.out.println("Já existe um cliente com esse documento.");
-            throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
-        }
-    }
 
     }
 

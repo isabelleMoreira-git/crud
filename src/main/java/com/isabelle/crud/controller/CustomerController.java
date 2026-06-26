@@ -80,10 +80,9 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        //Não retornar String
-
     }
 
     @GetMapping
@@ -100,7 +99,8 @@ public class CustomerController {
            return ResponseEntity.ok().body(AllCustomers);
 
         }catch (RuntimeException e) {
-           throw new RuntimeException(e);
+           System.out.println(e.getMessage());
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

@@ -4,13 +4,13 @@ import com.isabelle.crud.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 @Service
 public class EligibilityService {
-    @Autowired
-    private MccValidationService mccValidationService;
+    //Segunda tentativa
+//    @Autowired
+//    private MccValidationService mccValidationService;
 
+    //Primeira tentativa
 //    private static final Set<String> ALLOWED_MCCS = Set.of(
 //            "742",
 //            "1799",
@@ -38,9 +38,9 @@ public class EligibilityService {
             return false;
         }
 
-        if (!mccValidationService.MccIsValid(customer.getMcc())) {
-            return false;
-        }
+//        if (!mccValidationService.mccIsValid(customer.getMcc())) {
+//            return false;
+//        }
         
 
         if (customer.getAnnualTpv().doubleValue() > 30000) {

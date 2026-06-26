@@ -1,5 +1,8 @@
 package com.isabelle.crud.dto;
 
+import com.isabelle.crud.enums.Mcc;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,8 +18,9 @@ public class CustomerRequestDTO {
 
     private Boolean customerCompanyFlag;
 
-    @NotBlank
-    private String mcc;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Mcc mcc;
 
     @NotNull
     private BigDecimal annualTpv;
@@ -48,11 +52,11 @@ public class CustomerRequestDTO {
         this.customerCompanyFlag = customerCompanyFlag;
     }
 
-    public String getMcc() {
+    public Mcc getMcc() {
         return mcc;
     }
 
-    public void setMcc(String mcc) {
+    public void setMcc(Mcc mcc) {
         this.mcc = mcc;
     }
 
