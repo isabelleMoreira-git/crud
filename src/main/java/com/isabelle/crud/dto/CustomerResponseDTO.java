@@ -1,5 +1,7 @@
 package com.isabelle.crud.dto;
 
+import com.isabelle.crud.enums.Mcc;
+
 import java.math.BigDecimal;
 
 public class CustomerResponseDTO {
@@ -8,7 +10,7 @@ public class CustomerResponseDTO {
     private String document;
     private String indicationDocumentType;
     private Boolean customerCompanyFlag;
-    private String mcc;
+    private Mcc mcc;
     private BigDecimal annualTpv;
 
     public CustomerResponseDTO() {
@@ -19,7 +21,7 @@ public class CustomerResponseDTO {
             String document,
             String indicationDocumentType,
             Boolean customerCompanyFlag,
-            String mcc,
+            Mcc mcc,
             BigDecimal annualTpv) {
 
         this.id = id;
@@ -62,11 +64,11 @@ public class CustomerResponseDTO {
         this.customerCompanyFlag = customerCompanyFlag;
     }
 
-    public String getMcc() {
+    public Mcc getMcc() {
         return mcc;
     }
 
-    public void setMcc(String mcc) {
+    public void setMcc(Mcc mcc) {
         this.mcc = mcc;
     }
 
