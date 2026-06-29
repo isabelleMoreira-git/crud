@@ -1,6 +1,9 @@
 package com.isabelle.crud.service;
 
 //import com.isabelle.crud.eligibility.MccValidationService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.isabelle.crud.entity.Customer;
 import com.isabelle.crud.exception.CompanyDeletionNotAllowedException;
 import com.isabelle.crud.exception.CustomerNotFoundException;
@@ -13,26 +16,28 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class CustomerService {
+
     @Autowired
     private CustomerRepository customerRepository;
-//    @Autowired
-//    private MccValidationService mccValidationService;
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     public Customer createCustomer(Customer customer) {
         validateCreateCustomer(customer);
-        return customerRepository.save(customer);
+
+        Customer savedCustomer = customerRepository.save(customer);
+        logger.info("O cliente foi criado.");
+        return savedCustomer;
     }
 
     private void validateCreateCustomer(Customer customer){
+        logger.info("Iniciando validação para criação do cliente.");
         if (customer == null){
-            System.out.println("O cliente não foi informado.");
             throw new CustomerValidationException("O cliente não foi informado.");
         }
         if(customerRepository.findByDocument(customer.getDocument()).isPresent()){
-            System.out.println("Já existe um cliente com esse documento.");
             throw new CustomerAlreadyExistsException("Já existe um cliente com esse documento.");
         }
         if (customer.getDocument().length() != 11
@@ -58,59 +63,88 @@ public class CustomerService {
             throw new CustomerValidationException("Documento inválido para Pessoa Jurídica.");
         }
     }
-    /*Validar:
-     * Cliente nulo OK
-     * Cliente duplicado OK
-     * Documento, mcc e tipo obrigatórios OK
-     * mcc tem que ser númerico, e dentro das opções.
-     * Tipo e documento conectados OK
-     * Não aceitar exemplo do swagger OK string ou String
-     * */
 
     public List<Customer> getAllCustomers() {
+        logger.info("Buscando todos os clientes.");
         return customerRepository.findAll();
     }
 
     public Customer getCustomerById(Long id) {
+        logger.info("Buscando cliente pelo ID {}.", id);
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         boolean foundCustomer = optionalCustomer.isPresent();
 
         if (foundCustomer){
             Customer customer = optionalCustomer.get();
+            logger.info("O cliente encontrado pela busca por Id.");
             return(customer);
         } else {
-            throw new CustomerNotFoundException("Cliente não encontrado");
+            throw new CustomerNotFoundException("O cliente não foi encontrado.");
         }
     }
 
+    public Customer getCustomerByDocument(String document) {
+        logger.info("Buscando cliente pelo documento {}.", document);
+        Optional<Customer> optionalCustomer = customerRepository.findByDocument(document);
+        boolean foundCustomer = optionalCustomer.isPresent();
+
+        if (foundCustomer){
+            Customer customer = optionalCustomer.get();
+            logger.info("Cliente encontrado pela busca por documento. Id: {}.", customer.getId());
+            return(customer);
+        } else {
+            throw new CustomerNotFoundException("O cliente não foi encontrado.");
+        }
+    }
+
+    public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
+        logger.info("Buscando cliente pelo documento {} e tipo {}.", document, pfOuPj);
+
+        Customer customer = customerRepository.findByDocumentAndType(document, pfOuPj);
+
+        if(customer == null){
+            throw new CustomerNotFoundException("O cliente não foi encontrado");
+        }
+
+        logger.info("Cliente encontrado pela busca por documento e tipo. Id: {}.", customer.getId());
+        return customer;
+
+    }
+
+
     public void deleteCustomer(Long id) {
+        logger.info("Tentando apagar cliente pelo id {}.", id);
         Optional<Customer> optionalCustomer= customerRepository.findById(id);
         boolean foundCustomer = optionalCustomer.isPresent();
 
         if (foundCustomer){
             customerRepository.deleteById(id);
+            logger.info("Cliente encontrado e removido do banco com sucesso.");
         } else{
-            throw new CustomerNotFoundException("Cliente não encontrado");
+            throw new CustomerNotFoundException("O cliente não foi encontrado");
         }
     }
 
     public void deleteByDocumentAndType(String document, String type){
+        logger.info("Tentando apagar cliente pelo documento {} e tipo {}", document, type);
         Customer customer = customerRepository.findByDocumentAndType(document,type);
+
         if(customer == null){
-            throw new CustomerNotFoundException("Esse cliente não existe.");
+            throw new CustomerNotFoundException("O cliente não foi encontrado");
         }
 
         String pfOrPj = customer.getIndicationDocumentType();
 
         if ("PF".equals(pfOrPj)){
             customerRepository.deleteById(customer.getId());
+            logger.info("Cliente PF removido com sucesso. ID: {}, Documento: {}.", customer.getId(), document);
         } else {
             throw new CompanyDeletionNotAllowedException("Não é possível apagar Pessoa Jurídica.");
         }
     }
 
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
-
+        logger.info("Tentando atualizar o cliente pelo id {}.", id);
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         boolean foundCustomer = optionalCustomer.isPresent();
 
@@ -121,35 +155,15 @@ public class CustomerService {
             customer.setAnnualTpv(updatedCustomer.getAnnualTpv());
             customer.setCustomerCompanyFlag(updatedCustomer.getCustomerCompanyFlag());
 
-            return customerRepository.save(customer);
+            Customer savedCustomer = customerRepository.save(customer);
+            logger.info("O cliente {} foi encontrado e atualizado",
+                    customer.getId());
+            return savedCustomer;
         }else{
             throw new CustomerNotFoundException("O cliente não foi encontrado.");
         }
     }
-
-    public Customer getCustomerByDocument(String document) {
-        Optional<Customer> optionalCustomer = customerRepository.findByDocument(document);
-        boolean foundCustomer = optionalCustomer.isPresent();
-
-        if (foundCustomer){
-            Customer customer = optionalCustomer.get();
-            return(customer);
-        } else {
-            throw new CustomerNotFoundException("Cliente não encontrado");
-        }
-    }
-
-    public Customer getCustomerByDocumentAndType(String document, String pfOuPj) {
-
-        Customer customer = customerRepository.findByDocumentAndType(document, pfOuPj);
-        if(customer == null){
-            throw new CustomerNotFoundException("Esse cliente não existe.");
-        }
-
-        return customer;
-        }
-
-    }
+}
 
 
 
@@ -210,4 +224,16 @@ CreateCustomer
 //            throw new CustomerAlreadyExistsException("Cliente já cadastrado com esse documento");
 //        } else {return customerRepository.save(customer);
 //        }
-*/
+
+----------------------------------------------------------------------------
+validateCreateCustomer
+    /*Validar:
+     * Cliente nulo OK
+     * Cliente duplicado OK
+     * Documento, mcc e tipo obrigatórios OK
+     * mcc tem que ser númerico, e dentro das opções.
+     * Tipo e documento conectados OK
+     * Não aceitar exemplo do swagger OK string ou String
+     *
+
+ */

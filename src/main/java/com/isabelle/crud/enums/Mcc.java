@@ -26,3 +26,11 @@ public enum Mcc {
         return code;
     }
 }
+
+// mudar o retorno pra número.
+
+// receber o codigo e transformar no nome.
+
+//Tipos de numeral do @Enumerated
+
+//Flyway - migration db

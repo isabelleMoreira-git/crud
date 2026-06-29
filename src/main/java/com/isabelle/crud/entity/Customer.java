@@ -8,7 +8,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal; // mais seguro do que double pra valor monetário
 
 @Entity // essa classe representa uma tabela do banco
-@Table(name = "customers") // define o nome da tabela
+@Table(name = "custumers") // define o nome da tabela
 public class Customer {
 
     @Id // define a chave primária

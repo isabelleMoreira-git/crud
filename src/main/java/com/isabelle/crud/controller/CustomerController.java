@@ -160,6 +160,7 @@ public class CustomerController {
         }
     }
 
+    //dto
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(
             @PathVariable Long id,

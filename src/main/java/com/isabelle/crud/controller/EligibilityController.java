@@ -30,14 +30,14 @@ public class EligibilityController {
         catch(CustomerNotFoundException e){
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         }catch(RuntimeException e){
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-
         }
+        // retornar cnpj e dto
     }
 }
+
 // Injeção de dependência pelo construtor
 //    private final CustomerService customerService;
 //    private final EligibilityService eligibilityService;
