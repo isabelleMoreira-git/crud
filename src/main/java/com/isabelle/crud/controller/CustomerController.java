@@ -161,11 +161,11 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(
+    public ResponseEntity<CustomerResponseDTO> updateCustomer(
             @PathVariable Long id,
             @Valid @RequestBody Customer customer) {
         try {
-            return ResponseEntity.ok().body(customerService.updateCustomer(id, customer));
+            return ResponseEntity.ok().body(toResponseDTO(customerService.updateCustomer(id, customer)));
 
         }catch(CustomerNotFoundException e){
             System.out.println(e.getMessage());
