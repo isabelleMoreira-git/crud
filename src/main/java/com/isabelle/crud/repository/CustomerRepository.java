@@ -16,14 +16,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             "AND c.indicationDocumentType = :PfOrPj"
     )
     Customer findByDocumentAndType(String document, String PfOrPj);
-    // Usar o objeto ao invés do nome do banco.
 }
 
 //boolean existsByDocument(String document);
 // query method do Spring Data JPA (SELECT EXISTS(...))
 
-// JPQL
-
+    // JPQL
 //            value = "SELECT * FROM customers " +
 //                    "WHERE document = :document " +
 //                    "AND indication_document_type = :PfOrPj",

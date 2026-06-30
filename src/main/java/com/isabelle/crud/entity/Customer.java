@@ -5,14 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal; // mais seguro do que double pra valor monetário
+import java.math.BigDecimal;
 
-@Entity // essa classe representa uma tabela do banco
-@Table(name = "custumers") // define o nome da tabela
+@Entity
+@Table(name = "custumers")
 public class Customer {
 
-    @Id // define a chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // faz o banco gerar id automaticamente
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank

@@ -45,10 +45,6 @@ public class CustomerService {
                 || customer.getDocument().equals("string")) {
             throw new CustomerValidationException("Documento inválido.");
         }
-//        if(customer.getMcc().equals("string")
-//                || !mccValidationService.mccIsValid(customer.getMcc())){
-//            throw new CustomerValidationException("Mcc inválido.");
-//        }
         if((!customer.getIndicationDocumentType().equals("PF")
                 && !customer.getIndicationDocumentType().equals("PJ"))
                 || customer.getIndicationDocumentType().equals("String")){
@@ -234,6 +230,13 @@ validateCreateCustomer
      * mcc tem que ser númerico, e dentro das opções.
      * Tipo e documento conectados OK
      * Não aceitar exemplo do swagger OK string ou String
-     *
 
+----------------------------------------------------------------------------
+MccValidationService
+        if(customer.getMcc().equals("string")
+
+                || !mccValidationService.mccIsValid(customer.getMcc())){
+            throw new CustomerValidationException("Mcc inválido.");
+        }
  */
+
