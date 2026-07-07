@@ -1,9 +1,8 @@
 package com.isabelle.crud.controller;
 
-import com.isabelle.crud.dto.CustomerResponseDTO;
 import com.isabelle.crud.dto.EligibilityResponseDTO;
 import com.isabelle.crud.entity.Customer;
-import com.isabelle.crud.eligibility.EligibilityService;
+import com.isabelle.crud.service.EligibilityService;
 import com.isabelle.crud.exception.CustomerNotFoundException;
 import com.isabelle.crud.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;

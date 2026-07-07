@@ -1,6 +1,5 @@
-package com.isabelle.crud.eligibility;
+package com.isabelle.crud.service;
 
-import com.isabelle.crud.service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isabelle.crud.entity.Customer;
